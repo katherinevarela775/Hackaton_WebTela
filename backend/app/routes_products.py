@@ -1,87 +1,26 @@
 from flask import Blueprint, jsonify, request
-#1=crea un grupo de rutas,2= devuelve datos en JSON, 3= lee datos del usuario.
-from db import get_db
-#importa la funcion que abre la conexion a la base de datos.
-products_bp=Blueprint("productos",__name__)
-#crea un modulo de rutas llamdo productos.
+from app.db import get_db # Cambiado de get_db_connection a get_db
 
-@products_bp.route("/api/test", methods=["GET"])
-def test_api():
-    return jsonify({"message": "API funcionando correctamente"}), 200
+distributors_bp = Blueprint('distributors', name)
 
-#End point de categorias.
-@products_bp.route("/api/categories", methods=["GET"])
-#define la ruta: GET /api/categories.
-def get_categories():
-    
-    db= get_db()
-    #abre conexion con la base de datos.
-    
-    categories=db.execute(
-        "SELECT DISTINCT category FROM fabrics"
-    ).fetchall()
-    #busca todas las categorias.
-    
-    result = []
-    #creamos una lista vacia.
-    
-    for category in categories:
-    #recorre caad categoria .
-        result.append(category["category"])
-        #agrega el nombre a la lista.
-        
-    return jsonify(result)
-    #convierte la lista en JSON.
+@distributors_bp.route('/api/distributors', methods=['GET'])
+def get_distributors():
+    city = request.args.get('city')
+    conn = get_db()
+    cursor = conn.cursor()
 
+    # Usamos tu VISTA de rankings que es mucho más potente
+    query = "SELECT id, nombre, ciudad, puntuacion_promedio FROM vista_ranking_distribuidores"
+    params = []
 
+    if city:
+        query += " WHERE ciudad = ?"
+        params.append(city)
 
-#End points de productos.
-@products_bp.route("/api/products",methods=["GET"])
-def get_products():
-    
-    category_id=request.args.get("category_id")
-    #permite consultas como: /api/products?category_id=2.
-    min_stock=request.args.get("min_stock")
-    #permite: /api/products?min_stock=10.
-    
-    db=get_db()
-    
-    query="SELECT id, name, price, stock, category_id FROM fabrics where 1=1"
-    #permite agregar filtros despues.
-    params=[]
-         
-    if category_id:
-        query += " AND category_id = ?"
-        params.append(category_id)
-        #SQL final: SELECT * FROM fabrics WHERE category_id = 2
-        
-    if min_stock:
-        query += " AND stock >= ?"
-        params.append(min_stock)
-        #SQL= stock >= 10
-        
-    products = db.execute(query, params).fetchall()
-    
-    result=[]
-    
-    
-    for product in products:
-        
-        available=product["stock"] > 0
-        
-        result.append({
-            "id": product["id"],
-            "name": product["name"],
-            "price": product["price"],
-            "stock": product["stock"],
-            "category_id": product["category_id"],
-            "available": available
-            
-        })
-    return jsonify(result)
+    query += " ORDER BY puntuacion_promedio DESC"
 
+    cursor.execute(query, params)
+    distribuidores = cursor.fetchall()
+    conn.close()
 
-
-
-
-
+    return jsonify([dict(row) for row in distribuidores]) 
