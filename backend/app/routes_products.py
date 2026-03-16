@@ -6,8 +6,7 @@ products_bp = Blueprint("productos", name)
 @products_bp.route("/api/categories", methods=["GET"])
 def get_categories():
     db = get_db()
-# Cambiamos 'fabrics' por 'telas' y 'category' por 'nombre' de la tabla 'categorias'
-
+    # Cambiamos 'fabrics' por 'telas' y 'category' por 'nombre' de la tabla 'categorias'
     categories = db.execute("SELECT nombre FROM categorias").fetchall()
 
     return jsonify([cat["nombre"] for cat in categories])
