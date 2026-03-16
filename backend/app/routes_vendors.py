@@ -1,36 +1,32 @@
 from flask import Blueprint, jsonify, request
-from app.db import get_db_connection
+from app.db import get_db   # conexión a la base de datos del proyecto
 
 
-# API DE DISTRIBUIDORES
+distributors_bp = Blueprint('distributors', __name__)  # Creamos el blueprint para las rutas de distribuidores
 
-distributors_bp = Blueprint('distributors', __name__)  # Creamos el Blueprint para agrupar rutas
 
-@distributors_bp.route('/api/distributors', methods=['GET'])
+@distributors_bp.route('/api/distributors', methods=['GET'])  # Ruta para obtener distribuidores
 def get_distributors():
-    
-    
-    city = request.args.get('city') # REQUERIMIENTO: Filtro por Ciudad 
-    
-    conn = get_db_connection() # Abrimos la conexión a la base de datos
+
+    city = request.args.get('city')  # Obtener ciudad desde la URL
+
+    conn = get_db()     # Conexión a la base de datos
     cursor = conn.cursor()
-    
-    query = "SELECT id, nombre, ciudad, ranking, contacto_wa FROM distribuidores" # Usamos la tabla y los campos exactos
+
+    query = "SELECT id, nombre, ciudad, puntuacion_promedio FROM vista_ranking_distribuidores"
+
     params = []
-    
-    if city:
-        query += " WHERE ciudad = ?"  # Si viene el parámetro de ciudad, filtramos la consulta
+
+    if city:     # Filtro por ciudad si se envía en la URL
+        query += " WHERE ciudad = ?"
         params.append(city)
-    
-    query += " ORDER BY ranking DESC"  # Lógica de Ordenamiento (Mayor ranking primero
-    
-    
-    cursor.execute(query, params)   # Ejecutamos la consulta en la base de datos
+
+    query += " ORDER BY puntuacion_promedio DESC"
+
+    cursor.execute(query, params)
+
     distribuidores = cursor.fetchall()
+
     conn.close()
-    
-    
-    distribuidores_list = [dict(row) for row in distribuidores]  # Convertimos los resultados a una lista de diccionarios para el JSON
-    
-    
-    return jsonify(distribuidores_list)  # Retornamos el JSON formateado que espera el equipo de Frontend
+
+    return jsonify([dict(row) for row in distribuidores])
