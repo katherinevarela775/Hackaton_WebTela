@@ -1,25 +1,31 @@
-from flask import Blueprint, jsonify, request
-from app.db import get_db # Usamos la función de tu db.py
+# Este codigo crea una API que muestra distribuidores desde una base de datos
 
-distributors_bp = Blueprint('distributors', name)
+from flask import Blueprint, jsonify, request
+from app.db import get_db  
+
+distributors_bp = Blueprint('distributors', __name__)
 
 @distributors_bp.route('/api/distributors', methods=['GET'])
 def get_distributors():
-city = request.args.get('city')
-db = get_db()
+    city = request.args.get('city')
 
-# Usamos la vista definida en squema.sql
-query_str = "SELECT id, nombre, ciudad, puntuacion_promedio FROM vista_ranking_distribuidores"
-params = []
+    db = get_db()
 
-if city:
-    query_str += " WHERE ciudad LIKE ?"
-    params.append(f"%{city}%")
+    query_str = """
+        SELECT id, nombre, ciudad, puntuacion_promedio 
+        FROM vista_ranking_distribuidores
+    """
+    params = []
 
-query_str += " ORDER BY puntuacion_promedio DESC"
+    if city:
+        query_str += " WHERE ciudad LIKE ?"
+        params.append(f"%{city}%")
 
-distribuidores = db.execute(query_str, params).fetchall()
-return jsonify([dict(row) for row in distribuidores])
+    query_str += " ORDER BY puntuacion_promedio DESC"
+
+    distribuidores = db.execute(query_str, params).fetchall()
+
+    return jsonify([dict(row) for row in distribuidores])
 
 
 
