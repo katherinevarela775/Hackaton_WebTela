@@ -5,17 +5,17 @@ products_bp = Blueprint("productos", name)
 
 @products_bp.route("/api/categories", methods=["GET"])
 def get_categories():
-db = get_db()
+    db = get_db()
 # Cambiamos 'fabrics' por 'telas' y 'category' por 'nombre' de la tabla 'categorias'
 
-categories = db.execute("SELECT nombre FROM categorias").fetchall()
+    categories = db.execute("SELECT nombre FROM categorias").fetchall()
 
     return jsonify([cat["nombre"] for cat in categories])
 
 @products_bp.route("/api/products", methods=["GET"])
 def get_products():
-category_id = request.args.get("category_id")
-min_stock = request.args.get("min_stock")
+    category_id = request.args.get("category_id")
+    min_stock = request.args.get("min_stock")
 
     db = get_db()
     # Ajustamos a los nombres de squema.sql: id, nombre, precio_por_metro, stock_metros
