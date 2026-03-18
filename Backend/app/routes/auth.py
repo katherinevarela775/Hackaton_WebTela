@@ -30,3 +30,13 @@ def login():
         return jsonify({"msg": "Credenciales invalidas"}), 401
     access_token = create_access_token(identity=str(user.id))
     return jsonify({"access_token": access_token}), 200
+
+
+@bp.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    user_id = int(get_jwt_identity())
+    user = db.session.get(User, user_id)
+    if not user:
+        return jsonify({"msg": "Usuario no encontrado"}), 404
+    return jsonify({"id": user.id, "name": user.name, "email": user.email, "role": user.role, "avatar": user.avatar}), 200
