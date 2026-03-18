@@ -38,3 +38,22 @@ def get_all_users():
         'role': u.role,
         'created_at': u.created_at.isoformat() if u.created_at else None
     } for u in users]), 200
+
+
+@admin_bp.route('/api/admin/users/<int:user_id>/role', methods=['PATCH'])
+@jwt_required()
+@require_role('admin')
+def update_user_role(user_id):
+    from app.models.user import User
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    data = request.get_json()
+    if 'role' not in data:
+        return jsonify({'error': 'Se requiere el campo role'}), 400
+    valid_roles = ['cliente', 'vendedor', 'admin']
+    if data['role'] not in valid_roles:
+        return jsonify({'error': f'Rol invalido. Opciones: {valid_roles}'}), 400
+    user.role = data['role']
+    db.session.commit()
+    return jsonify({'message': 'Rol actualizado', 'user_id': user_id, 'role': user.role}), 200
