@@ -8,3 +8,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
 </head>
+<body class="bg-gray-50 font-inter">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="/" class="logo">BulkFab</a>
+        </div>
+        <div class="navbar-links">
+            <a href="#productos">Productos</a>
+            <a href="#categorias">Categorias</a>
+        </div>
+        <div class="navbar-actions">
+            <button id="loginBtn" onclick="openLoginModal()">Iniciar Sesion</button>
+            <button id="logoutBtn" onclick="logout()" style="display:none">Cerrar Sesion</button>
+            <span id="userName" class="user-name"></span>
+            <button class="cart-btn" onclick="openModal('cartModal')">
+                🛒 <span id="cartBadge" class="cart-badge">0</span>
+            </button>
+            <button class="fav-btn" onclick="renderFavoritesPage('favoritesGrid'); openModal('favoritesModal')">♡</button>
+        </div>
+    </nav>
