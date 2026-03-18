@@ -80,3 +80,17 @@ def update_vendor_product(product_id):
     db.session.commit()
     from app.utils.helpers import serialize_product
     return jsonify({'message': 'Producto actualizado', 'product': serialize_product(product)}), 200
+
+
+@vendor_bp.route('/api/vendor/products/<int:product_id>', methods=['DELETE'])
+@jwt_required()
+@require_role('vendedor')
+def delete_vendor_product(product_id):
+    from app.models.product import Product
+    user_id = get_jwt_identity()
+    product = Product.query.filter_by(id=product_id, vendor_id=user_id).first()
+    if not product:
+        return jsonify({'error': 'Producto no encontrado'}), 404
+    db.session.delete(product)
+    db.session.commit()
+    return jsonify({'message': 'Producto eliminado'}), 200
