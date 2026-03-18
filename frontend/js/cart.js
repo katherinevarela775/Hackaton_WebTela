@@ -51,3 +51,34 @@ function clearCart() {
     saveCart();
     updateCartBadge();
 }
+
+function renderCartItems(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (cart.length === 0) {
+        container.innerHTML = '<p class="empty-cart">El carrito esta vacio</p>';
+        return;
+    }
+    container.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <span class="cart-item-name">${item.product?.name || 'Producto #' + item.product_id}</span>
+            <span class="cart-item-qty">x${item.quantity}</span>
+            <span class="cart-item-price">${formatPrice((item.product?.price || 0) * item.quantity)}</span>
+            <button onclick="removeFromCart(${item.product_id}); renderCartItems('${containerId}')">✕</button>
+        </div>
+    `).join('') + `<div class="cart-total"><strong>Total: ${formatPrice(getCartTotal())}</strong></div>`;
+}
+
+async function checkoutCart() {
+    if (!isLoggedIn()) { showToast('Debes iniciar sesion para comprar', 'error'); return; }
+    if (cart.length === 0) { showToast('El carrito esta vacio', 'error'); return; }
+    const items = cart.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.product?.price || 0 }));
+    const total = getCartTotal();
+    try {
+        await apiFetch('/api/orders', { method: 'POST', body: JSON.stringify({ total, items }) });
+        clearCart();
+        showToast('Pedido realizado con exito', 'success');
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
