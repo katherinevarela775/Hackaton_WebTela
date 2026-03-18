@@ -31,3 +31,11 @@ def get_products():
         query = query.order_by(Product.sales_count.desc())
     productos = query.all()
     return jsonify([serialize_product(p) for p in productos]), 200
+
+
+@bp.route("/<int:id>", methods=["GET"])
+def get_product(id):
+    p = db.session.get(Product, id)
+    if not p:
+        return jsonify({"msg": "Producto no encontrado"}), 404
+    return jsonify(serialize_product(p)), 200
