@@ -70,3 +70,13 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({'message': 'Usuario eliminado'}), 200
+
+
+@admin_bp.route('/api/admin/products', methods=['GET'])
+@jwt_required()
+@require_role('admin')
+def get_all_products():
+    from app.models.product import Product
+    from app.utils.helpers import serialize_product
+    products = Product.query.all()
+    return jsonify([serialize_product(p) for p in products]), 200
