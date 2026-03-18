@@ -39,3 +39,11 @@ def get_product(id):
     if not p:
         return jsonify({"msg": "Producto no encontrado"}), 404
     return jsonify(serialize_product(p)), 200
+
+
+@bp.route("/featured", methods=["GET"])
+def featured():
+    ofertas = Product.query.filter(Product.tags.contains('"oferta"' )).limit(6).all()
+    if not ofertas:
+        ofertas = Product.query.order_by(Product.sales_count.desc()).limit(6).all()
+    return jsonify([serialize_product(p) for p in ofertas]), 200
