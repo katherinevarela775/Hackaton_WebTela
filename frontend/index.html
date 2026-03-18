@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BulkFab — Telas al por mayor. Compra directamente de fabricantes con precios por volumen.">
+  <title>BulkFab · Telas al por mayor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      corePlugins: { preflight: false },
+      theme: { extend: { colors: { primary: '#0056d2' } } }
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Notifications -->
+  <div class="notificacion-container" id="notificacion-container"></div>
+
+  <!-- Confirmation modal -->
+  <div id="modal-confirmacion" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center">
+      <p id="confirm-mensaje" class="text-slate-800 text-base font-medium mb-6">¿Confirmar acción?</p>
+      <div class="flex gap-3 justify-center">
+        <button class="btn-confirm bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors" id="confirm-si">Sí</button>
+        <button class="btn-cancel bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition-colors" id="confirm-no">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LANDING PAGE ===== -->
+  <div id="menu-inicial" class="relative min-h-screen flex items-center justify-center overflow-hidden" style="background: linear-gradient(135deg, #0a1628 0%, #0f2040 50%, #0a1628 100%);">
+    <div class="menu-particle" style="left:10%; animation-duration:15s;"></div>
+    <div class="menu-particle" style="left:30%; width:15px; height:15px; animation-duration:25s;"></div>
+    <div class="menu-particle" style="left:60%; animation-duration:18s;"></div>
+    <div class="menu-particle" style="left:80%; width:8px; height:8px; animation-duration:22s;"></div>
+    <div class="menu-particle" style="left:90%; animation-duration:12s;"></div>
+
+    <div class="relative z-10 w-full max-w-md mx-auto px-4">
+      <div class="text-center mb-8">
+        <h1 class="text-5xl font-bold text-white tracking-tight mb-2" style="letter-spacing:-1px;">BulkFab</h1>
+        <p class="text-slate-400 text-xs tracking-widest uppercase">Telas al por mayor · Paraguay</p>
+      </div>
+
+      <div class="rounded-2xl p-8 shadow-2xl border" style="background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); backdrop-filter:blur(12px);">
+        <div class="flex flex-col gap-3">
+          <button onclick="entrarCliente()" class="w-full text-white font-semibold py-3.5 rounded-xl transition-all text-base" style="background:#0056d2;" onmouseover="this.style.background='#0042a4'" onmouseout="this.style.background='#0056d2'">
+            🚀 Explorar tienda
+          </button>
+          <button onclick="mostrarLoginVendedor()" class="w-full font-semibold py-3.5 rounded-xl border transition-all text-base text-white" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+            👔 Acceso vendedores
+          </button>
+          <button onclick="mostrarLoginAdmin()" class="w-full py-2.5 rounded-xl transition-colors text-sm font-medium text-slate-400 hover:text-slate-200">
+            🔐 Administrador
+          </button>
+        </div>
+
+        <div id="login-vendedor-form" class="menu-form" style="display:none;">
+          <div class="border-t mt-5 pt-5" style="border-color:rgba(255,255,255,0.1);">
+            <p class="text-slate-300 text-sm font-medium mb-3">Acceso para vendedores</p>
+            <div class="flex flex-col gap-3">
+              <input type="email" id="vendedor-email" placeholder="Email" autocomplete="off"
+                class="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all text-white placeholder-slate-400"
+                style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+              <input type="password" id="vendedor-password" placeholder="Contraseña"
+                class="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all text-white placeholder-slate-400"
+                style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+              <button onclick="loginVendedor()" class="w-full text-white font-semibold py-3 rounded-xl transition-colors" style="background:#0056d2;">Ingresar</button>
+              <p class="text-center text-slate-400 text-sm">¿No tienes cuenta? <a href="#" onclick="mostrarRegistroVendedor()" class="text-blue-400 hover:text-blue-300 font-medium">Regístrate</a></p>
+            </div>
+          </div>
+        </div>
+
+        <div id="registro-vendedor-form" class="menu-form" style="display:none;">
+          <div class="border-t mt-5 pt-5" style="border-color:rgba(255,255,255,0.1);">
+            <p class="text-slate-300 text-sm font-medium mb-3">Crear cuenta de vendedor</p>
+            <div class="flex flex-col gap-3">
+              <input type="text" id="reg-nombre" placeholder="Nombre completo"
+                class="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all text-white placeholder-slate-400"
+                style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+              <input type="email" id="reg-email" placeholder="Email"
+                class="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all text-white placeholder-slate-400"
+                style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+              <input type="password" id="reg-password" placeholder="Contraseña"
+                class="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all text-white placeholder-slate-400"
+                style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+              <button onclick="registrarVendedor()" class="w-full text-white font-semibold py-3 rounded-xl transition-colors" style="background:#0056d2;">Registrarse</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="login-admin-form" class="menu-form" style="display:none;">
+          <div class="border-t mt-5 pt-5" style="border-color:rgba(255,255,255,0.1);">
+            <p class="text-slate-300 text-sm font-medium mb-3">Acceso administrador</p>
+            <div class="flex flex-col gap-3">
+              <input type="email" id="admin-email" placeholder="Email"
+                class="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all text-white placeholder-slate-400"
+                style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+              <input type="password" id="admin-password" placeholder="Contraseña"
+                class="w-full rounded-xl px-4 py-3 text-sm focus:outline-none transition-all text-white placeholder-slate-400"
+                style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);">
+              <button onclick="loginAdmin()" class="w-full text-white font-semibold py-3 rounded-xl transition-colors" style="background:#0056d2;">Acceder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="text-center text-slate-600 text-xs mt-5">Conectando fabricantes con compradores en Paraguay</p>
+    </div>
+  </div>
+
+  <!-- ===== TIENDA ===== -->
+  <div id="tienda" style="display:none">
+
+    <!-- Header -->
+    <header style="background:rgba(255,255,255,0.92); backdrop-filter:blur(10px); position:sticky; top:0; z-index:100; border-bottom:1px solid #f1f5f9; box-shadow:0 2px 16px rgba(0,0,0,0.04);">
+      <div class="flex items-center justify-between gap-4 px-6" style="height:68px; max-width:1280px; margin:0 auto;">
+        <div class="flex items-center gap-3">
+          <div class="logo font-bold text-2xl" style="background:linear-gradient(135deg,#1f2a3a,#2c3e50); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-0.5px;">BulkFab</div>
+          <button onclick="volverAlMenuDesdeTienda()" class="btn-menu text-xs font-medium text-slate-500 border border-slate-200 px-3 py-1.5 rounded-lg transition-colors hover:bg-slate-50">← Menú</button>
+        </div>
+        <div>
+          <input type="text" id="buscador" placeholder="Buscar tela..."
+            class="bg-slate-50 text-sm rounded-full px-5 py-2.5 focus:outline-none transition-all"
+            style="width:280px; border:1px solid #e2e8f0;">
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="btn-fav-header relative flex items-center justify-center cursor-pointer transition-all rounded-full" id="btnFavHeader" onclick="verFavoritos()" role="button" aria-label="Ver favoritos" style="width:44px; height:44px; background:white; border:1px solid #e2e8f0; font-size:20px;">
+            ❤️
+            <span id="contador-fav" class="absolute text-white text-[10px] font-bold rounded-full flex items-center justify-center" style="top:-4px; right:-4px; background:#e74c3c; min-width:18px; height:18px; padding:0 4px;">0</span>
+          </div>
+          <div class="carrito flex items-center gap-1.5 cursor-pointer transition-all rounded-full font-semibold text-sm" id="btnCarrito" role="button" aria-label="Ver carrito" style="background:white; border:1px solid #e2e8f0; padding:8px 18px;">
+            🛒 <span id="contador" class="text-white text-xs rounded-full px-2 py-0.5 font-bold" style="background:#0056d2;">0</span>
+          </div>
+          <div class="btn-vendedor-header flex items-center justify-center cursor-pointer transition-all rounded-full text-xl" id="btnVendedorHeader" onclick="abrirPanelVendedor()" role="button" aria-label="Panel de vendedor" style="display:none; width:44px; height:44px; background:white; border:1px solid #e2e8f0;">💼</div>
+          <div class="btn-vendedor-header flex items-center justify-center cursor-pointer transition-all rounded-full text-xl" id="btnAdminHeader" onclick="abrirPanelAdmin()" role="button" aria-label="Panel de administrador" style="display:none; width:44px; height:44px; background:white; border:1px solid #e2e8f0;">👑</div>
+          <div class="btn-menu btn-usuario text-sm font-semibold text-slate-700 px-4 py-2 rounded-full" id="btnNombreCliente" style="display:none;"></div>
+          <div class="btn-menu text-sm font-semibold cursor-pointer px-4 py-2 rounded-full transition-colors" id="btnLoginCliente" onclick="mostrarModalCliente()" style="color:#0056d2; border:1px solid #bfdbfe; background:#eff6ff;">Iniciar sesión</div>
+          <div class="btn-menu btn-logout text-sm font-medium cursor-pointer px-4 py-2 rounded-full transition-colors text-slate-500 hover:text-red-500" onclick="logout()" id="btnLogout" style="display:none;">Cerrar sesión</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero text-white text-center" style="background:linear-gradient(160deg,#0a1628 0%,#0d2e6e 45%,#1a4fa8 100%); padding:60px 24px 48px; position:relative; overflow:hidden;">
+      <!-- subtle background grid -->
+      <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;"></div>
+      <div style="position:relative;z-index:1;">
+        <span style="display:inline-block;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#93c5fd;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:50px;margin-bottom:20px;">Paraguay · Industria Textil</span>
+        <h1 class="font-black text-white" style="font-size:clamp(2.8rem,6vw,4.5rem);letter-spacing:-2px;line-height:1.05;margin-bottom:16px;">Telas al por mayor</h1>
+        <p style="color:#bfdbfe;font-size:1.15rem;max-width:520px;margin:0 auto 40px;line-height:1.6;opacity:0.95;">Calidad directa de fábrica · Precios por volumen · Envíos a los 18 departamentos</p>
+        <!-- Stats row -->
+        <div style="display:inline-flex;gap:0;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:16px;overflow:hidden;backdrop-filter:blur(8px);">
+          <div style="padding:14px 28px;border-right:1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:22px;font-weight:900;color:white;letter-spacing:-0.5px;">10+</div>
+            <div style="font-size:11px;color:#93c5fd;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Telas premium</div>
+          </div>
+          <div style="padding:14px 28px;border-right:1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:22px;font-weight:900;color:white;letter-spacing:-0.5px;">5</div>
+            <div style="font-size:11px;color:#93c5fd;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Distribuidores</div>
+          </div>
+          <div style="padding:14px 28px;">
+            <div style="font-size:22px;font-weight:900;color:white;letter-spacing:-0.5px;">18</div>
+            <div style="font-size:11px;color:#93c5fd;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-top:2px;">Departamentos</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ofertas destacadas (JS-generated, keep as-is) -->
+    <section class="ofertas-destacadas" id="ofertas-destacadas">
+      <h2>🔥 Ofertas del día</h2>
+      <div class="ofertas-grid" id="ofertas-grid"></div>
+    </section>
+
+    <!-- About banner (keep as-is) -->
+    <section class="about-banner">
+      <div class="banner-content">
+        <h2>Pasión por la tela desde 2026</h2>
+        <p>En BulkFab calificamos personalmente a los vendedores para facilitar el proceso de selección de productos de calidad y así impulsar el negocio textil.</p>
+      </div>
+    </section>
+
+    <!-- Categorías (JS-generated) -->
+    <section class="categorias" id="categorias"></section>
+
+    <!-- Filtros -->
+    <div class="filtros-wrapper">
+    <section class="filtros" id="filtros-section">
+      <select id="filtroVenta">
+        <option value="todos">Tipo de venta</option>
+        <option value="mayorista">Mayorista</option>
+        <option value="minorista">Minorista</option>
+      </select>
+      <select id="filtroRanking">
+        <option value="0">Ranking</option>
+        <option value="3">⭐⭐⭐ y más</option>
+        <option value="4">⭐⭐⭐⭐ y más</option>
+        <option value="5">⭐⭐⭐⭐⭐</option>
+      </select>
+      <select id="filtroEtiqueta">
+        <option value="todas">Todas las etiquetas</option>
+        <option value="oferta">En oferta</option>
+        <option value="nuevo">Nuevo</option>
+        <option value="liquidacion">Liquidación</option>
+      </select>
+      <select id="ordenPrecio">
+        <option value="normal">Ordenar por</option>
+        <option value="menor">Precio: menor a mayor</option>
+        <option value="mayor">Precio: mayor a menor</option>
+        <option value="ventas">Más vendidos</option>
+      </select>
+      <button onclick="aplicarFiltros()">Aplicar</button>
+      <button onclick="cargarProductos()">Ver todo</button>
+    </section>
+    </div>
+
+    <!-- Products (JS-generated) -->
+    <section class="productos" id="productos"></section>
+
+    <!-- Cart panel (JS-generated content) -->
+    <div id="carrito-panel">
+      <div id="carrito-header"><h3>Tu carrito</h3><div onclick="cerrarCarrito()">✕</div></div>
+      <div id="carrito-contenido"></div>
+      <div id="carrito-resumen">
+        <div id="carrito-subtotal"><span>Subtotal:</span><span id="subtotal-valor">$0</span></div>
+        <button id="btn-pagar" onclick="confirmarPago()">Proceder al pago</button>
+        <button id="vaciar-carrito" onclick="vaciarCarrito()">Vaciar carrito</button>
+      </div>
+    </div>
+
+    <!-- Product detail modal (JS-generated content) -->
+    <div id="modal-detalles" class="modal">
+      <div class="modal-contenido">
+        <span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
+        <div class="modal-imagen" id="modal-imagen"></div>
+        <div class="modal-info">
+          <h2 id="modal-titulo"></h2>
+          <div class="modal-estrellas" id="modal-estrellas"></div>
+          <div class="modal-precio" id="modal-precio"></div>
+          <div class="modal-descripcion" id="modal-descripcion"></div>
+          <div class="modal-tabla-precios" id="modal-tabla-precios"></div>
+          <div class="modal-cantidad"><label for="modal-cant">Cantidad:</label><input type="number" id="modal-cant" value="1" min="1"></div>
+          <div class="modal-botones"><button class="btn" id="modal-agregar">Agregar al carrito</button><button class="btn fav" id="modal-favorito">♥ Favorito</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== VENDOR PANEL ===== -->
+  <div id="panel-vendedor" style="display:none; min-height:100vh; background:#f8fafc; padding:32px 24px;">
+    <div style="max-width:900px; margin:0 auto;">
+      <div class="flex items-center gap-4 mb-8">
+        <button class="btn-volver text-sm font-medium text-slate-500 border border-slate-200 px-4 py-2 rounded-xl transition-colors hover:bg-slate-100 hover:text-slate-700" onclick="volverAlMenu()">← Volver al menú</button>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">Panel del vendedor</h1>
+          <p class="subtitulo text-slate-500 text-sm mt-0.5">Bienvenido, <span id="nombre-vendedor" class="font-semibold text-blue-600"></span> — gestiona tus productos y precios por volumen</p>
+        </div>
+      </div>
+
+      <!-- Add product card -->
+      <div class="seccion bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+        <h3 class="text-base font-semibold text-slate-800 flex items-center gap-2 mb-5">
+          <span style="color:#0056d2;">➕</span> Agregar nuevo producto
+        </h3>
+        <div class="grid-2 grid grid-cols-2 gap-4 mb-4">
+          <input id="v-nombre" placeholder="Nombre del producto"
+            class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-slate-50">
+          <input id="v-precio" type="number" placeholder="Precio base (1 unidad)"
+            class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-slate-50">
+        </div>
+        <div class="grid-2 grid grid-cols-2 gap-4 mb-4">
+          <select id="v-categoria" class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-slate-50">
+            <option>Natural</option><option>Sintética</option><option>Mixta</option><option>Especial</option>
+          </select>
+          <select id="v-venta" class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-slate-50">
+            <option value="ambos">Mayorista y minorista</option>
+            <option value="mayorista">Solo mayorista</option>
+            <option value="minorista">Solo minorista</option>
+          </select>
+        </div>
+        <div class="grid-2 grid grid-cols-2 gap-4 mb-4">
+          <input id="v-stock" type="number" placeholder="Cantidad en stock"
+            class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-slate-50">
+          <input id="v-imagen" type="file" accept="image/*"
+            class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-600 bg-slate-50">
+        </div>
+        <textarea id="v-descripcion" placeholder="Descripción del producto"
+          class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-slate-50 mb-4" rows="3"></textarea>
+
+        <div class="precios-volumen bg-slate-50 border border-slate-100 rounded-xl p-4 mb-4">
+          <label class="text-sm font-semibold text-slate-700 mb-3 block">📦 Precios por volumen (dejar en blanco si no aplica)</label>
+          <div class="grid-3 grid grid-cols-3 gap-4">
+            <input id="v-precio5" type="number" placeholder="Precio para 5+ uds"
+              class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-white">
+            <input id="v-precio10" type="number" placeholder="Precio para 10+ uds"
+              class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-white">
+            <input id="v-precio20" type="number" placeholder="Precio para 20+ uds"
+              class="border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-blue-400 transition-all bg-white">
+          </div>
+        </div>
+
+        <div class="mb-5">
+          <label class="text-sm font-semibold text-slate-700 block mb-2">Etiquetas para filtros:</label>
+          <div class="etiquetas-opciones flex gap-4">
+            <label class="etiqueta-check flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+              <input type="checkbox" id="tag-oferta" class="rounded"> 🔥 Oferta
+            </label>
+            <label class="etiqueta-check flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+              <input type="checkbox" id="tag-nuevo" class="rounded"> 🆕 Nuevo
+            </label>
+            <label class="etiqueta-check flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+              <input type="checkbox" id="tag-liquidacion" class="rounded"> 🏷️ Liquidación
+            </label>
+          </div>
+        </div>
+        <button id="btn-publicar" onclick="agregarProducto()" class="text-white font-semibold px-6 py-3 rounded-xl transition-colors text-sm" style="background:#0056d2;">Publicar producto</button>
+      </div>
+
+      <!-- My products -->
+      <div class="seccion bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <h3 class="text-base font-semibold text-slate-800 mb-5">📦 Mis productos</h3>
+        <div id="mis-productos" class="mis-productos-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN PANEL ===== -->
+  <div id="panel-admin" style="display:none; min-height:100vh; background:#f0f4f8;">
+
+    <!-- Admin top bar -->
+    <div style="background:linear-gradient(135deg,#0f172a 0%,#1a3260 100%); padding:0 28px; box-shadow:0 2px 16px rgba(0,0,0,0.2);">
+      <div style="max-width:1200px; margin:0 auto; height:60px; display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:0;">
+          <span style="font-size:18px; font-weight:800; color:white; letter-spacing:-0.5px; margin-right:32px;">BulkFab <span style="color:#60a5fa;">Admin</span></span>
+          <nav style="display:flex; gap:2px;">
+            <button class="admin-nav-tab active" data-tab="dashboard"  onclick="adminTab('dashboard')">Dashboard</button>
+            <button class="admin-nav-tab"         data-tab="productos"  onclick="adminTab('productos')">Productos</button>
+            <button class="admin-nav-tab"         data-tab="usuarios"   onclick="adminTab('usuarios')">Usuarios</button>
+            <button class="admin-nav-tab"         data-tab="pedidos"    onclick="adminTab('pedidos')">Pedidos</button>
+          </nav>
+        </div>
+        <button onclick="volverAlMenu()" style="color:#94a3b8; font-size:13px; background:none; border:none; cursor:pointer; font-weight:500; transition:color 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'">← Salir</button>
+      </div>
+    </div>
+
+    <!-- Admin content -->
+    <div style="max-width:1200px; margin:0 auto; padding:28px 28px 60px;">
+
+      <!-- TAB: DASHBOARD -->
+      <div id="admin-tab-dashboard" class="admin-tab-content">
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:#dbeafe; color:#1d4ed8;">📦</div>
+            <div>
+              <div class="admin-stat-num" id="stat-productos">0</div>
+              <div class="admin-stat-label">Productos</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:#dcfce7; color:#15803d;">💼</div>
+            <div>
+              <div class="admin-stat-num" id="stat-vendedores">0</div>
+              <div class="admin-stat-label">Vendedores</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:#f3e8ff; color:#7e22ce;">👥</div>
+            <div>
+              <div class="admin-stat-num" id="stat-clientes">0</div>
+              <div class="admin-stat-label">Clientes</div>
+            </div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-icon" style="background:#fef3c7; color:#92400e;">🛒</div>
+            <div>
+              <div class="admin-stat-num" id="stat-ventas">0</div>
+              <div class="admin-stat-label">Pedidos totales</div>
+            </div>
+          </div>
+        </div>
+        <div class="seccion">
+          <h3>🕐 Últimos pedidos</h3>
+          <div id="admin-pedidos-recientes"></div>
+        </div>
+      </div>
+
+      <!-- TAB: PRODUCTOS -->
+      <div id="admin-tab-productos" class="admin-tab-content" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Productos</h2>
+          <button class="btn" style="width:auto; margin:0; padding:10px 22px;" onclick="abrirFormProductoAdmin()">+ Nuevo producto</button>
+        </div>
+        <!-- Inline create/edit form -->
+        <div id="admin-form-producto" class="seccion" style="display:none; margin-bottom:20px;"></div>
+        <!-- Product list -->
+        <div id="admin-productos"></div>
+      </div>
+
+      <!-- TAB: USUARIOS -->
+      <div id="admin-tab-usuarios" class="admin-tab-content" style="display:none;">
+        <div style="margin-bottom:20px;">
+          <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Usuarios</h2>
+        </div>
+        <div class="seccion" style="padding:0; overflow:hidden;">
+          <div id="admin-usuarios"></div>
+        </div>
+      </div>
+
+      <!-- TAB: PEDIDOS -->
+      <div id="admin-tab-pedidos" class="admin-tab-content" style="display:none;">
+        <div style="margin-bottom:20px;">
+          <h2 style="font-size:20px; font-weight:700; color:#0f172a;">Pedidos</h2>
+        </div>
+        <div id="admin-pedidos"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SHIPPING MODAL ===== -->
+  <div id="modal-envio" class="modal" role="dialog" aria-modal="true" aria-label="Datos de envío">
+    <div class="modal-contenido modal-envio-contenido">
+      <button class="cerrar-modal" onclick="cerrarModalEnvio()" aria-label="Cerrar">&times;</button>
+      <div class="envio-header">
+        <span class="envio-icono">📦</span>
+        <h2>Datos de envío</h2>
+        <p>Completá tu información para recibir el pedido</p>
+      </div>
+      <form id="form-envio" onsubmit="return false;">
+        <div class="envio-grid">
+          <div class="envio-campo">
+            <label for="envio-nombre">Nombre completo *</label>
+            <input type="text" id="envio-nombre" placeholder="Juan Pérez" autocomplete="name" required>
+          </div>
+          <div class="envio-campo">
+            <label for="envio-email">Email de contacto *</label>
+            <input type="email" id="envio-email" placeholder="juan@email.com" autocomplete="email" required>
+          </div>
+          <div class="envio-campo">
+            <label for="envio-telefono">Teléfono *</label>
+            <input type="tel" id="envio-telefono" placeholder="+595 999 123 456" autocomplete="tel" required>
+          </div>
+          <div class="envio-campo">
+            <label for="envio-ciudad">Ciudad *</label>
+            <input type="text" id="envio-ciudad" placeholder="Asunción" autocomplete="address-level2" required>
+          </div>
+          <div class="envio-campo envio-campo--ancho">
+            <label for="envio-direccion">Dirección *</label>
+            <input type="text" id="envio-direccion" placeholder="Av. España 1234, Barrio Las Mercedes" autocomplete="street-address" required>
+          </div>
+          <div class="envio-campo">
+            <label for="envio-departamento">Departamento</label>
+            <select id="envio-departamento" autocomplete="address-level1">
+              <option value="">Seleccionar...</option>
+              <option>Capital</option>
+              <option>Alto Paraná</option>
+              <option>Central</option>
+              <option>Itapúa</option>
+              <option>Concepción</option>
+              <option>Amambay</option>
+              <option>Caaguazú</option>
+              <option>Caazapá</option>
+              <option>Canindeyú</option>
+              <option>Cordillera</option>
+              <option>Guairá</option>
+              <option>Misiones</option>
+              <option>Ñeembucú</option>
+              <option>Paraguarí</option>
+              <option>Presidente Hayes</option>
+              <option>San Pedro</option>
+              <option>Alto Paraguay</option>
+              <option>Boquerón</option>
+            </select>
+          </div>
+          <div class="envio-campo envio-campo--ancho">
+            <label for="envio-notas">Notas adicionales</label>
+            <textarea id="envio-notas" placeholder="Referencias del domicilio, instrucciones especiales..." rows="3"></textarea>
+          </div>
+        </div>
+        <div class="envio-resumen" id="envio-resumen"></div>
+        <div class="envio-botones">
+          <button type="button" class="btn btn-cancelar-envio" onclick="cerrarModalEnvio()">Cancelar</button>
+          <button type="button" class="btn btn-confirmar-envio" onclick="procesarPedido()">Confirmar pedido →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== CLIENT AUTH MODAL ===== -->
+  <div id="modal-cliente" class="modal" role="dialog" aria-modal="true" aria-label="Iniciar sesión o registrarse">
+    <div class="modal-contenido modal-auth">
+      <button class="cerrar-modal" onclick="cerrarModalCliente()" aria-label="Cerrar">&times;</button>
+      <div id="cli-login">
+        <h2>Iniciar sesión</h2>
+        <input type="email" id="cli-email" placeholder="Email" autocomplete="email">
+        <input type="password" id="cli-password" placeholder="Contraseña" autocomplete="current-password">
+        <button class="btn" onclick="loginCliente()">Entrar</button>
+        <p>¿No tienes cuenta? <a href="#" onclick="verRegistroCliente(); return false;">Regístrate gratis</a></p>
+      </div>
+      <div id="cli-registro" style="display:none;">
+        <h2>Crear cuenta</h2>
+        <input type="text" id="cli-reg-nombre" placeholder="Nombre completo" autocomplete="name">
+        <input type="email" id="cli-reg-email" placeholder="Email" autocomplete="email">
+        <input type="password" id="cli-reg-password" placeholder="Contraseña" autocomplete="new-password">
+        <button class="btn" onclick="registrarCliente()">Registrarse</button>
+        <p>¿Ya tienes cuenta? <a href="#" onclick="verLoginCliente(); return false;">Inicia sesión</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/utils.js" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/products.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/favorites.js" defer></script>
+  <script src="js/vendor.js" defer></script>
+  <script src="js/admin.js" defer></script>
+  <script src="js/modal.js" defer></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>
