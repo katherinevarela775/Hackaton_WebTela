@@ -30,3 +30,15 @@ def add_favorite():
     db.session.add(fav)
     db.session.commit()
     return jsonify({'message': 'Agregado a favoritos', 'favorite': fav.to_dict()}), 201
+
+
+@favorites_bp.route('/api/favorites/<int:product_id>', methods=['DELETE'])
+@jwt_required()
+def remove_favorite(product_id):
+    user_id = get_jwt_identity()
+    fav = Favorite.query.filter_by(user_id=user_id, product_id=product_id).first()
+    if not fav:
+        return jsonify({'error': 'Favorito no encontrado'}), 404
+    db.session.delete(fav)
+    db.session.commit()
+    return jsonify({'message': 'Eliminado de favoritos'}), 200
