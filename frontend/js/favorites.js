@@ -24,3 +24,27 @@ async function toggleFavorite(productId) {
     }
     updateFavoriteButtons();
 }
+
+function updateFavoriteButtons() {
+    document.querySelectorAll('.btn-favorite').forEach(btn => {
+        const productId = parseInt(btn.closest('[data-id]')?.dataset.id);
+        if (productId) {
+            btn.textContent = isFavorite(productId) ? '♥' : '♡';
+            btn.classList.toggle('active', isFavorite(productId));
+        }
+    });
+}
+
+async function renderFavoritesPage(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    await loadFavorites();
+    if (userFavorites.length === 0) {
+        container.innerHTML = '<p class="empty">No tienes favoritos guardados</p>';
+        return;
+    }
+    const productIds = userFavorites.map(f => f.product_id);
+    const products = await fetchProducts();
+    const favProducts = products.filter(p => productIds.includes(p.id));
+    container.innerHTML = favProducts.map(renderProductCard).join('');
+}
