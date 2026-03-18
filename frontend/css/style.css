@@ -40,3 +40,31 @@ body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; }
 .btn-add-cart:hover { background: #0f3460; }
 .btn-favorite { background: transparent; border: 1px solid #ddd; padding: 0.5rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; }
 .btn-favorite.active { color: #e94560; border-color: #e94560; }
+
+/* MODALES */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.active { display: flex; }
+.modal { background: white; border-radius: 16px; padding: 2rem; max-width: 480px; width: 90%; position: relative; max-height: 85vh; overflow-y: auto; }
+.modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888; }
+.modal h2 { font-size: 1.4rem; margin-bottom: 1.5rem; }
+.modal form input, .modal form select { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 1rem; font-size: 0.9rem; }
+.modal form button { width: 100%; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 2rem; right: 2rem; padding: 0.75rem 1.5rem; border-radius: 8px; color: white; font-size: 0.9rem; z-index: 9999; animation: slideIn 0.3s ease; }
+.toast-success { background: #22c55e; }
+.toast-error { background: #ef4444; }
+.toast-info { background: #3b82f6; }
+@keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* FOOTER */
+.footer { background: #1a1a2e; color: rgba(255,255,255,0.7); text-align: center; padding: 2rem; margin-top: 4rem; }
+.footer-brand { font-weight: 600; color: white; margin-bottom: 0.25rem; }
+
+/* STATS CARDS */
+.stat-card { background: white; border-radius: 12px; padding: 1.5rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.stat-card h3 { font-size: 0.85rem; color: #888; text-transform: uppercase; margin-bottom: 0.5rem; }
+.stat-card p { font-size: 1.8rem; font-weight: 700; color: #1a1a2e; }
+
+/* LOADING / EMPTY */
+.loading, .empty, .error { text-align: center; padding: 3rem; color: #888; font-size: 1rem; }
