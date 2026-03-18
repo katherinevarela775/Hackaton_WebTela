@@ -21,7 +21,7 @@ def get_products():
         query = query.filter(Product.ranking >= min_ranking)
     tag = request.args.get("tags")
     if tag and tag not in ("todas", ""):
-        query = query.filter(Product.tags.contains(f""{tag}""))
+        query = query.filter(Product.tags.contains(f"{tag}"))
     sort = request.args.get("sort", "normal")
     if sort == "menor":
         query = query.order_by(Product.base_price.asc())

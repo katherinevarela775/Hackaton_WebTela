@@ -30,19 +30,19 @@ PRODUCTOS = [
     {"name": "Organza Cristal", "description": "Organza translucida de seda y poliester.", "base_price": 62000, "stock": 500, "category": "Mixta", "vendor_email": "ventas@textilesoriente.com.py", "sale_type": "ambos", "tags": ["nuevo"], "ranking": 4.7, "volume_prices": {"5": 58000, "10": 54000, "20": 51000}},
 ]
 
-    print("
-=== Creando productos ===")
-    for p in PRODUCTOS:
-        if Product.query.filter_by(name=p["name"]).first():
-            print(f"  [skip] {p['name']}")
-            continue
-        vendor = vendor_map[p["vendor_email"]]
-        product = Product(name=p["name"], description=p["description"], base_price=p["base_price"], stock=p["stock"], category=p["category"], vendor_id=vendor.id, sale_type=p["sale_type"], tags=p["tags"], ranking=p["ranking"], volume_prices=p["volume_prices"], images=[], sales_count=0)
-        db.session.add(product)
-        print(f"  [ok]   {p['name']}")
-    db.session.commit()
-    print("Seed completado.")
-    print(f"Total productos en BD: {Product.query.count()}")
+print("=== Creando productos ===")
+vendor_map = {}
+for p in PRODUCTOS:
+    if Product.query.filter_by(name=p["name"]).first():
+        print(f"  [skip] {p['name']}")
+        continue
+    vendor = vendor_map[p["vendor_email"]]
+    product = Product(name=p["name"], description=p["description"], base_price=p["base_price"], stock=p["stock"], category=p["category"], vendor_id=vendor.id, sale_type=p["sale_type"], tags=p["tags"], ranking=p["ranking"], volume_prices=p["volume_prices"], images=[], sales_count=0)
+    db.session.add(product)
+    print(f"  [ok]   {p['name']}")
+db.session.commit()
+print("Seed completado.")
+print(f"Total productos en BD: {Product.query.count()}")
 
 with app.app_context():
     print("=== Creando vendedores ===")
