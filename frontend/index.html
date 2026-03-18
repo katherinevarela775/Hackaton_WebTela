@@ -60,3 +60,67 @@
         <div id="productsGrid" class="products-grid"></div>
     </main>
 
+    <!-- MODAL LOGIN -->
+    <div id="loginModal" class="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" data-modal-close>✕</button>
+            <h2>Iniciar Sesion</h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" required />
+                <input type="password" id="loginPassword" placeholder="Contraseña" required />
+                <button type="submit" class="btn-primary">Ingresar</button>
+            </form>
+            <p>¿No tienes cuenta? <a href="#" onclick="openRegisterModal()">Registrate</a></p>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRO -->
+    <div id="registerModal" class="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" data-modal-close>✕</button>
+            <h2>Crear Cuenta</h2>
+            <form id="registerForm">
+                <input type="text" id="registerName" placeholder="Nombre completo" required />
+                <input type="email" id="registerEmail" placeholder="Email" required />
+                <input type="password" id="registerPassword" placeholder="Contraseña" required />
+                <select id="registerRole">
+                    <option value="cliente">Cliente</option>
+                    <option value="vendedor">Vendedor</option>
+                </select>
+                <button type="submit" class="btn-primary">Registrarme</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CARRITO -->
+    <div id="cartModal" class="modal-overlay">
+        <div class="modal modal-cart">
+            <button class="modal-close" data-modal-close>✕</button>
+            <h2>Carrito de Compras</h2>
+            <div id="cartContainer"></div>
+            <button class="btn-primary btn-checkout" onclick="checkoutCart()">Confirmar Pedido</button>
+        </div>
+    </div>
+
+    <!-- MODAL FAVORITOS -->
+    <div id="favoritesModal" class="modal-overlay">
+        <div class="modal modal-favorites">
+            <button class="modal-close" data-modal-close>✕</button>
+            <h2>Mis Favoritos</h2>
+            <div id="favoritesGrid" class="products-grid"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE PRODUCTO -->
+    <div id="productDetailModal" class="modal-overlay">
+        <div class="modal modal-product">
+            <button class="modal-close" data-modal-close>✕</button>
+            <img class="modal-image" src="" alt="" />
+            <h2 class="modal-title"></h2>
+            <p class="modal-description"></p>
+            <p class="modal-price"></p>
+            <p class="modal-stock"></p>
+            <button class="btn-add-cart btn-primary">Agregar al Carrito</button>
+        </div>
+    </div>
+
