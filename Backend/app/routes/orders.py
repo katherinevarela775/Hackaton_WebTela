@@ -1,0 +1,63 @@
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from app import db
+from app.models.order import Order
+
+orders_bp = Blueprint('orders', __name__)
+
+
+@orders_bp.route('/api/orders', methods=['POST'])
+@jwt_required()
+def create_order():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+
+    if not data or 'total' not in data:
+        return jsonify({'error': 'Se requiere el campo total'}), 400
+
+    import json
+    items_json = json.dumps(data.get('items', []))
+
+    order = Order(
+        user_id=user_id,
+        total=data['total'],
+        status=data.get('status', 'pendiente'),
+        items=items_json
+    )
+    db.session.add(order)
+    db.session.commit()
+
+    return jsonify({'message': 'Pedido creado', 'order': order.to_dict()}), 201
+
+
+@orders_bp.route('/api/orders', methods=['GET'])
+@jwt_required()
+def get_orders():
+    user_id = get_jwt_identity()
+    orders = Order.query.filter_by(user_id=user_id).order_by(Order.created_at.desc()).all()
+    return jsonify([o.to_dict() for o in orders]), 200
+
+
+@orders_bp.route('/api/orders/<int:order_id>', methods=['GET'])
+@jwt_required()
+def get_order(order_id):
+    user_id = get_jwt_identity()
+    order = Order.query.filter_by(id=order_id, user_id=user_id).first()
+    if not order:
+        return jsonify({'error': 'Pedido no encontrado'}), 404
+    return jsonify(order.to_dict()), 200
+
+
+@orders_bp.route('/api/orders/<int:order_id>/status', methods=['PATCH'])
+@jwt_required()
+def update_order_status(order_id):
+    user_id = get_jwt_identity()
+    order = Order.query.filter_by(id=order_id, user_id=user_id).first()
+    if not order:
+        return jsonify({'error': 'Pedido no encontrado'}), 404
+    data = request.get_json()
+    if 'status' not in data:
+        return jsonify({'error': 'Se requiere el campo status'}), 400
+    order.status = data['status']
+    db.session.commit()
+    return jsonify({'message': 'Estado actualizado', 'order': order.to_dict()}), 200
