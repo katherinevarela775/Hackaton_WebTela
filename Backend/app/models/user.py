@@ -11,3 +11,7 @@ class User(db.Model):
     avatar = db.Column(db.String(200), nullable=True)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+
+    @property
+    def password(self):
+        raise AttributeError("password no es legible")
