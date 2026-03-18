@@ -15,3 +15,6 @@ class User(db.Model):
     @property
     def password(self):
         raise AttributeError("password no es legible")
+    @password.setter
+    def password(self, plain_password):
+        self.password_hash = bcrypt.generate_password_hash(plain_password).decode("utf-8")
