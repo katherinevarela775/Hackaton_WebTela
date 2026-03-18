@@ -1,7 +1,4 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret")
@@ -15,4 +12,4 @@ class Config:
     ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
     SESSION_COOKIE_SAMESITE = "None"
     SESSION_COOKIE_SECURE = False
-    PERMANENT_SESSION_LIFETIME = 600
+    PERMANENT_SESSION_LIFETIME = 600  # 10 minutos — necesario para que el state de OAuth no expire
