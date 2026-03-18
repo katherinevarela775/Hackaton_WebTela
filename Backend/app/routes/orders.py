@@ -28,3 +28,11 @@ def create_order():
     db.session.commit()
 
     return jsonify({'message': 'Pedido creado', 'order': order.to_dict()}), 201
+
+
+@orders_bp.route('/api/orders', methods=['GET'])
+@jwt_required()
+def get_orders():
+    user_id = get_jwt_identity()
+    orders = Order.query.filter_by(user_id=user_id).order_by(Order.created_at.desc()).all()
+    return jsonify([o.to_dict() for o in orders]), 200
