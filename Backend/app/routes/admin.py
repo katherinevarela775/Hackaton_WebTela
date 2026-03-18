@@ -102,3 +102,19 @@ def get_all_orders():
     from app.models.order import Order
     orders = Order.query.order_by(Order.created_at.desc()).all()
     return jsonify([o.to_dict() for o in orders]), 200
+
+
+@admin_bp.route('/api/admin/orders/<int:order_id>/status', methods=['PATCH'])
+@jwt_required()
+@require_role('admin')
+def admin_update_order_status(order_id):
+    from app.models.order import Order
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({'error': 'Pedido no encontrado'}), 404
+    data = request.get_json()
+    if 'status' not in data:
+        return jsonify({'error': 'Se requiere el campo status'}), 400
+    order.status = data['status']
+    db.session.commit()
+    return jsonify({'message': 'Estado de pedido actualizado', 'order': order.to_dict()}), 200
