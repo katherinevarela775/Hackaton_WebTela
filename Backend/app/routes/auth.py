@@ -18,3 +18,15 @@ def register():
     db.session.add(user)
     db.session.commit()
     return jsonify({"msg": "Usuario creado"}), 201
+
+
+@bp.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    if not data or not data.get("email") or not data.get("password"):
+        return jsonify({"msg": "Faltan datos"}), 400
+    user = User.query.filter_by(email=data.get("email")).first()
+    if not user or not user.check_password(data.get("password")):
+        return jsonify({"msg": "Credenciales invalidas"}), 401
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({"access_token": access_token}), 200
