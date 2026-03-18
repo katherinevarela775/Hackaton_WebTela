@@ -46,3 +46,37 @@ def create_vendor_product():
     db.session.commit()
     from app.utils.helpers import serialize_product
     return jsonify({'message': 'Producto creado', 'product': serialize_product(product)}), 201
+
+
+@vendor_bp.route('/api/vendor/products/<int:product_id>', methods=['PUT'])
+@jwt_required()
+@require_role('vendedor')
+def update_vendor_product(product_id):
+    from app.models.product import Product
+    import json
+    user_id = get_jwt_identity()
+    product = Product.query.filter_by(id=product_id, vendor_id=user_id).first()
+    if not product:
+        return jsonify({'error': 'Producto no encontrado'}), 404
+
+    data = request.get_json()
+    if 'name' in data:
+        product.name = data['name']
+    if 'description' in data:
+        product.description = data['description']
+    if 'price' in data:
+        product.price = data['price']
+    if 'stock' in data:
+        product.stock = data['stock']
+    if 'category' in data:
+        product.category = data['category']
+    if 'colors' in data:
+        product.colors = json.dumps(data['colors'])
+    if 'sizes' in data:
+        product.sizes = json.dumps(data['sizes'])
+    if 'images' in data:
+        product.images = json.dumps(data['images'])
+
+    db.session.commit()
+    from app.utils.helpers import serialize_product
+    return jsonify({'message': 'Producto actualizado', 'product': serialize_product(product)}), 200
