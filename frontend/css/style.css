@@ -12,3 +12,15 @@ body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; }
 .navbar-actions button { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
 .navbar-actions button:hover { background: rgba(255,255,255,0.1); }
 .cart-badge { background: #e94560; color: white; border-radius: 50%; padding: 0 5px; font-size: 0.75rem; margin-left: 4px; }
+
+/* HERO */
+.hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 5rem 2rem; text-align: center; }
+.hero-title { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+.hero-subtitle { font-size: 1.2rem; opacity: 0.85; max-width: 600px; margin: 0 auto 2rem; }
+.btn-primary { background: #e94560; color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; }
+.btn-primary:hover { background: #c73652; }
+
+/* FILTROS */
+.filters-section { padding: 1.5rem 2rem; background: white; border-bottom: 1px solid #eee; }
+.filters-container { display: flex; gap: 1rem; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+.filter-input, .filter-select { padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 150px; }
