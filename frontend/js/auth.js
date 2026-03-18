@@ -10,6 +10,11 @@ async function login(email, password) {
     return data;
 }
 
+function logout() {
+    removeToken();
+    window.location.reload();
+}
+
 async function register(name, email, password, role = 'cliente') {
     const data = await apiFetch('/api/auth/register', {
         method: 'POST',
