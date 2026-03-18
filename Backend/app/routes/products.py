@@ -47,3 +47,12 @@ def featured():
     if not ofertas:
         ofertas = Product.query.order_by(Product.sales_count.desc()).limit(6).all()
     return jsonify([serialize_product(p) for p in ofertas]), 200
+
+
+@bp.route("/categories", methods=["GET"])
+def categories():
+    cats = db.session.query(Product.category).distinct().all()
+    result = [c[0] for c in cats if c[0]]
+    if not result:
+        result = ["Algodon", "Lino", "Poliester", "Denim"]
+    return jsonify(result), 200
