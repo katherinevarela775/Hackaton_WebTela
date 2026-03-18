@@ -39,4 +39,13 @@ def create_app(config_class=Config):
     def serve_js(filename):
         return send_from_directory(os.path.join(FRONTEND_DIR, "js"), filename)
 
+    @app.route("/callback.html")
+    def serve_callback():
+        return send_file(os.path.join(FRONTEND_DIR, "callback.html"))
+
+    @app.route("/")
+    @app.route("/index.html")
+    def serve_index():
+        return send_file(os.path.join(FRONTEND_DIR, "index.html"))
+
     return app
