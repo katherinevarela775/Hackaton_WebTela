@@ -31,4 +31,12 @@ def create_app(config_class=Config):
     def uploaded_file(filename):
         return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
+    @app.route("/css/<path:filename>")
+    def serve_css(filename):
+        return send_from_directory(os.path.join(FRONTEND_DIR, "css"), filename)
+
+    @app.route("/js/<path:filename>")
+    def serve_js(filename):
+        return send_from_directory(os.path.join(FRONTEND_DIR, "js"), filename)
+
     return app
