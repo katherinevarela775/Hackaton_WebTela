@@ -57,3 +57,16 @@ def update_user_role(user_id):
     user.role = data['role']
     db.session.commit()
     return jsonify({'message': 'Rol actualizado', 'user_id': user_id, 'role': user.role}), 200
+
+
+@admin_bp.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+@require_role('admin')
+def delete_user(user_id):
+    from app.models.user import User
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'Usuario eliminado'}), 200
