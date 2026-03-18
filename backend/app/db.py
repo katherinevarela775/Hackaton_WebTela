@@ -1,52 +1,54 @@
 import sqlite3
 import os
 
-# Ruta absoluta a la base de datos SQLite (en la carpeta backend/)
-_BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATABASE  = os.path.join(_BASE_DIR, 'textil_connect.db')
-SCHEMA    = os.path.join(_BASE_DIR, 'squema.sql')
-SEED      = os.path.join(_BASE_DIR, 'seed.sql')
+# Configuración de Rutas (Path Management)
+# Buscamos la carpeta donde está este archivo (backend/app/)
+_APP_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# La base de datos se guardará un nivel arriba, en la carpeta /backend/
+_BACKEND_DIR = os.path.dirname(_APP_DIR)
+DATABASE = os.path.join(_BACKEND_DIR, 'textil_connect.db')
 
-def get_db() -> sqlite3.Connection:
-    """Abre y devuelve una conexión a la base de datos.
-    Las filas se devuelven como diccionarios (sqlite3.Row).
+# Rutas a tus archivos SQL
+SCHEMA = os.path.join(_APP_DIR, 'squema.sql')
+SEED = os.path.join(_APP_DIR, 'seed.sql')
+
+def get_db():
+    """
+    Crea una conexión a la base de datos.
+    Configura row_factory para que los resultados sean accesibles por nombre de columna.
     """
     conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row   # acceso por nombre de columna
-    conn.execute("PRAGMA foreign_keys = ON")
+    conn.row_factory = sqlite3.Row  # Esto permite hacer row['nombre'] en lugar de row[0]
+    conn.execute("PRAGMA foreign_keys = ON") # Activa la integridad referencial
     return conn
 
-
-def init_db(with_seed: bool = False) -> None:
-    """Crea las tablas a partir de squema.sql.
-    Si with_seed=True también inserta los datos de seed.sql.
+def init_db(with_seed=False):
     """
+    Inicializa la base de datos usando squema.sql.
+    Si with_seed es True, también carga los datos de seed.sql.
+    """
+    if not os.path.exists(SCHEMA):
+        print(f"Error: No se encontró el archivo {SCHEMA}")
+        return
+
     conn = get_db()
+    
+    # Ejecutar el esquema (Tablas y Vistas)
     with open(SCHEMA, 'r', encoding='utf-8') as f:
         conn.executescript(f.read())
-
-    if with_seed:
+    
+    # Ejecutar los datos iniciales si se solicita
+    if with_seed and os.path.exists(SEED):
         with open(SEED, 'r', encoding='utf-8') as f:
             conn.executescript(f.read())
-
-    conn.close()
-
-
-def query(sql: str, args: tuple = ()) -> list[dict]:
-    """Ejecuta un SELECT y devuelve una lista de diccionarios."""
-    conn = get_db()
-    cur  = conn.execute(sql, args)
-    rows = [dict(r) for r in cur.fetchall()]
-    conn.close()
-    return rows
-
-
-def execute(sql: str, args: tuple = ()) -> int:
-    """Ejecuta INSERT / UPDATE / DELETE y devuelve el lastrowid."""
-    conn = get_db()
-    cur  = conn.execute(sql, args)
+            
     conn.commit()
-    last_id = cur.lastrowid
     conn.close()
-    return last_id
+    print("Base de datos inicializada correctamente.")
+
+def query(sql, args=()):
+    """
+    Función utilitaria para realizar SELECTs rápidos.
+    Retorna una lista de diccionarios.
+    """
