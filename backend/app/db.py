@@ -1,54 +1,73 @@
 import sqlite3
 import os
+from flask import current_app, g
 
-# Configuración de Rutas (Path Management)
-# Buscamos la carpeta donde está este archivo (backend/app/)
+# --- CONFIGURACIÓN DE RUTAS ---
+# Ubicación de la carpeta 'app'
 _APP_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# La base de datos se guardará un nivel arriba, en la carpeta /backend/
-_BACKEND_DIR = os.path.dirname(_APP_DIR)
-DATABASE = os.path.join(_BACKEND_DIR, 'textil_connect.db')
-
-# Rutas a tus archivos SQL
-SCHEMA = os.path.join(_APP_DIR, 'squema.sql')
-SEED = os.path.join(_APP_DIR, 'seed.sql')
+# La DB se guarda en la raíz de 'backend'
+_DATABASE_PATH = os.path.join(os.path.dirname(_APP_DIR), 'textil_connect.db')
+# Archivos SQL dentro de 'app'
+_SCHEMA_SQL = os.path.join(_APP_DIR, 'squema.sql')
+_SEED_SQL   = os.path.join(_APP_DIR, 'seed.sql')
 
 def get_db():
     """
-    Crea una conexión a la base de datos.
-    Configura row_factory para que los resultados sean accesibles por nombre de columna.
+    Crea o recupera la conexión a la base de datos.
+    Usa el objeto 'g' de Flask si se corre dentro de la app, 
+    o una conexión simple si se corre como test independiente.
     """
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row  # Esto permite hacer row['nombre'] en lugar de row[0]
-    conn.execute("PRAGMA foreign_keys = ON") # Activa la integridad referencial
+    conn = sqlite3.connect(_DATABASE_PATH)
+    conn.row_factory = sqlite3.Row  # Crucial: convierte filas en diccionarios
+    conn.execute("PRAGMA foreign_keys = ON") # Mantiene la integridad de telas/categorías
     return conn
 
-def init_db(with_seed=False):
+def init_db(with_seed=True):
     """
-    Inicializa la base de datos usando squema.sql.
-    Si with_seed es True, también carga los datos de seed.sql.
+    Limpia y construye la base de datos desde cero.
+    Perfecto para resetear el catálogo de telas durante el hackathon.
     """
-    if not os.path.exists(SCHEMA):
-        print(f"Error: No se encontró el archivo {SCHEMA}")
-        return
+    if not os.path.exists(_SCHEMA_SQL):
+        raise FileNotFoundError(f"No se encontró el archivo de esquema en: {_SCHEMA_SQL}")
 
-    conn = get_db()
+    db = get_db()
     
-    # Ejecutar el esquema (Tablas y Vistas)
-    with open(SCHEMA, 'r', encoding='utf-8') as f:
-        conn.executescript(f.read())
-    
-    # Ejecutar los datos iniciales si se solicita
-    if with_seed and os.path.exists(SEED):
-        with open(SEED, 'r', encoding='utf-8') as f:
-            conn.executescript(f.read())
-            
-    conn.commit()
-    conn.close()
-    print("Base de datos inicializada correctamente.")
+    try:
+        # 1. Crear Tablas y Vistas (Schema)
+        with open(_SCHEMA_SQL, 'r', encoding='utf-8') as f:
+            db.executescript(f.read())
+        
+        # 2. Cargar datos de Paraguay (Seed)
+        if with_seed and os.path.exists(_SEED_SQL):
+            with open(_SEED_SQL, 'r', encoding='utf-8') as f:
+                db.executescript(f.read())
+        
+        db.commit()
+        print(f"✅ Base de datos Textil Connect inicializada en: {_DATABASE_PATH}")
+    except sqlite3.Error as e:
+        print(f"❌ Error de SQLite al inicializar: {e}")
+    finally:
+        db.close()
 
-def query(sql, args=()):
+def query(sql, args=(), one=False):
     """
-    Función utilitaria para realizar SELECTs rápidos.
-    Retorna una lista de diccionarios.
+    Ejecuta una consulta de lectura.
+    Uso: query("SELECT * FROM telas WHERE id = ?", (1,), one=True)
     """
+    db = get_db()
+    cur = db.execute(sql, args)
+    rv = [dict(row) for row in cur.fetchall()]
+    db.close()
+    return (rv[0] if rv else None) if one else rv
+
+def execute(sql, args=()):
+    """
+    Ejecuta una acción de escritura (INSERT, UPDATE, DELETE).
+    Retorna el ID del último elemento insertado.
+    """
+    db = get_db()
+    cur = db.execute(sql, args)
+    db.commit()
+    last_id = cur.lastrowid
+    db.close()
+    return last_id
