@@ -39,3 +39,24 @@
         </div>
     </section>
 
+    <!-- FILTROS -->
+    <section class="filters-section" id="productos">
+        <div class="filters-container">
+            <input type="text" id="searchInput" placeholder="Buscar telas..." class="filter-input" />
+            <select id="categoryFilter" class="filter-select">
+                <option value="">Todas las categorias</option>
+            </select>
+            <select id="sortFilter" class="filter-select">
+                <option value="">Ordenar por</option>
+                <option value="price_asc">Precio: menor a mayor</option>
+                <option value="price_desc">Precio: mayor a menor</option>
+                <option value="name">Nombre A-Z</option>
+            </select>
+        </div>
+    </section>
+
+    <!-- GRID DE PRODUCTOS -->
+    <main class="products-section">
+        <div id="productsGrid" class="products-grid"></div>
+    </main>
+
