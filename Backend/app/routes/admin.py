@@ -23,3 +23,18 @@ def get_admin_stats():
         'total_orders': total_orders,
         'total_revenue': total_revenue
     }), 200
+
+
+@admin_bp.route('/api/admin/users', methods=['GET'])
+@jwt_required()
+@require_role('admin')
+def get_all_users():
+    from app.models.user import User
+    users = User.query.all()
+    return jsonify([{
+        'id': u.id,
+        'name': u.name,
+        'email': u.email,
+        'role': u.role,
+        'created_at': u.created_at.isoformat() if u.created_at else None
+    } for u in users]), 200
