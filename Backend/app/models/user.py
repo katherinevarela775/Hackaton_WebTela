@@ -18,3 +18,8 @@ class User(db.Model):
     @password.setter
     def password(self, plain_password):
         self.password_hash = bcrypt.generate_password_hash(plain_password).decode("utf-8")
+
+    def check_password(self, plain_password):
+        if not self.password_hash:
+            return False
+        return bcrypt.check_password_hash(self.password_hash, plain_password)
