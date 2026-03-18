@@ -27,4 +27,8 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     app.secret_key = app.config["SECRET_KEY"]
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    @app.route("/uploads/<filename>")
+    def uploaded_file(filename):
+        return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
     return app
