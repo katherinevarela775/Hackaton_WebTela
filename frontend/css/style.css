@@ -2,3 +2,13 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; }
+
+/* NAVBAR */
+.navbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; background: #1a1a2e; color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.logo { font-size: 1.5rem; font-weight: 700; color: #e94560; text-decoration: none; }
+.navbar-links a { color: white; text-decoration: none; margin: 0 1rem; opacity: 0.85; transition: opacity 0.2s; }
+.navbar-links a:hover { opacity: 1; }
+.navbar-actions { display: flex; align-items: center; gap: 0.75rem; }
+.navbar-actions button { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+.navbar-actions button:hover { background: rgba(255,255,255,0.1); }
+.cart-badge { background: #e94560; color: white; border-radius: 50%; padding: 0 5px; font-size: 0.75rem; margin-left: 4px; }
