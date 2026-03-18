@@ -46,3 +46,18 @@ def get_order(order_id):
     if not order:
         return jsonify({'error': 'Pedido no encontrado'}), 404
     return jsonify(order.to_dict()), 200
+
+
+@orders_bp.route('/api/orders/<int:order_id>/status', methods=['PATCH'])
+@jwt_required()
+def update_order_status(order_id):
+    user_id = get_jwt_identity()
+    order = Order.query.filter_by(id=order_id, user_id=user_id).first()
+    if not order:
+        return jsonify({'error': 'Pedido no encontrado'}), 404
+    data = request.get_json()
+    if 'status' not in data:
+        return jsonify({'error': 'Se requiere el campo status'}), 400
+    order.status = data['status']
+    db.session.commit()
+    return jsonify({'message': 'Estado actualizado', 'order': order.to_dict()}), 200
