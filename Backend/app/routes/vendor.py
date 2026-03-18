@@ -117,3 +117,35 @@ def get_vendor_orders():
         except Exception:
             pass
     return jsonify(vendor_orders), 200
+
+
+@vendor_bp.route('/api/vendor/stats', methods=['GET'])
+@jwt_required()
+@require_role('vendedor')
+def get_vendor_stats():
+    from app.models.product import Product
+    from app.models.order import Order
+    import json
+    user_id = get_jwt_identity()
+    products = Product.query.filter_by(vendor_id=user_id).all()
+    total_products = len(products)
+    product_ids = [p.id for p in products]
+
+    orders = Order.query.all()
+    total_sales = 0
+    total_revenue = 0.0
+    for order in orders:
+        try:
+            items = json.loads(order.items or '[]')
+            for item in items:
+                if int(item.get('product_id', -1)) in product_ids:
+                    total_sales += item.get('quantity', 1)
+                    total_revenue += item.get('price', 0) * item.get('quantity', 1)
+        except Exception:
+            pass
+
+    return jsonify({
+        'total_products': total_products,
+        'total_sales': total_sales,
+        'total_revenue': total_revenue
+    }), 200
