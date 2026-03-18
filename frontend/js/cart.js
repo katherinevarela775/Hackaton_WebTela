@@ -33,6 +33,19 @@ function updateCartItemQty(productId, quantity) {
     }
 }
 
+function getCartTotal() {
+    return cart.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0);
+}
+
+function getCartCount() {
+    return cart.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+function updateCartBadge() {
+    const badge = document.getElementById('cartBadge');
+    if (badge) badge.textContent = getCartCount();
+}
+
 function clearCart() {
     cart = [];
     saveCart();
