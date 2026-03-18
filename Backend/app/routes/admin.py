@@ -80,3 +80,16 @@ def get_all_products():
     from app.utils.helpers import serialize_product
     products = Product.query.all()
     return jsonify([serialize_product(p) for p in products]), 200
+
+
+@admin_bp.route('/api/admin/products/<int:product_id>', methods=['DELETE'])
+@jwt_required()
+@require_role('admin')
+def admin_delete_product(product_id):
+    from app.models.product import Product
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'error': 'Producto no encontrado'}), 404
+    db.session.delete(product)
+    db.session.commit()
+    return jsonify({'message': 'Producto eliminado por admin'}), 200
