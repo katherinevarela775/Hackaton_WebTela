@@ -93,3 +93,12 @@ def admin_delete_product(product_id):
     db.session.delete(product)
     db.session.commit()
     return jsonify({'message': 'Producto eliminado por admin'}), 200
+
+
+@admin_bp.route('/api/admin/orders', methods=['GET'])
+@jwt_required()
+@require_role('admin')
+def get_all_orders():
+    from app.models.order import Order
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    return jsonify([o.to_dict() for o in orders]), 200
