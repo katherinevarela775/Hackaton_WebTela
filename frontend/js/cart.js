@@ -17,3 +17,24 @@ function addToCart(productId, product = null, quantity = 1) {
     updateCartBadge();
     showToast('Producto agregado al carrito', 'success');
 }
+
+function removeFromCart(productId) {
+    cart = cart.filter(item => item.product_id !== productId);
+    saveCart();
+    updateCartBadge();
+}
+
+function updateCartItemQty(productId, quantity) {
+    const item = cart.find(i => i.product_id === productId);
+    if (item) {
+        item.quantity = quantity;
+        if (item.quantity <= 0) removeFromCart(productId);
+        else saveCart();
+    }
+}
+
+function clearCart() {
+    cart = [];
+    saveCart();
+    updateCartBadge();
+}
