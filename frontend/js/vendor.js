@@ -28,3 +28,64 @@ async function loadVendorProducts() {
         </tr>
     `).join('');
 }
+
+async function deleteVendorProduct(productId) {
+    if (!confirm('¿Eliminar este producto?')) return;
+    await apiFetch(`/api/vendor/products/${productId}`, { method: 'DELETE' });
+    showToast('Producto eliminado', 'success');
+    loadVendorProducts();
+}
+
+async function createVendorProduct(formData) {
+    const product = await apiFetch('/api/vendor/products', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+    });
+    showToast('Producto creado', 'success');
+    loadVendorProducts();
+    return product;
+}
+
+async function updateVendorProduct(productId, formData) {
+    const product = await apiFetch(`/api/vendor/products/${productId}`, {
+        method: 'PUT',
+        body: JSON.stringify(formData)
+    });
+    showToast('Producto actualizado', 'success');
+    loadVendorProducts();
+    return product;
+}
+
+async function loadVendorOrders() {
+    const orders = await apiFetch('/api/vendor/orders');
+    const container = document.getElementById('vendorOrdersList');
+    if (!container) return;
+    container.innerHTML = orders.map(o => `
+        <tr>
+            <td>${o.id}</td>
+            <td>${o.user_id}</td>
+            <td>${formatPrice(o.total)}</td>
+            <td><span class="badge badge-${o.status}">${o.status}</span></td>
+            <td>${o.created_at}</td>
+        </tr>
+    `).join('');
+}
+
+function bindVendorProductForm() {
+    const form = document.getElementById('vendorProductForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = {
+            name: form.querySelector('[name=name]').value,
+            description: form.querySelector('[name=description]').value,
+            price: parseFloat(form.querySelector('[name=price]').value),
+            stock: parseInt(form.querySelector('[name=stock]').value),
+            category: form.querySelector('[name=category]').value
+        };
+        const productId = form.dataset.editId;
+        if (productId) await updateVendorProduct(parseInt(productId), data);
+        else await createVendorProduct(data);
+        form.reset();
+    });
+}
