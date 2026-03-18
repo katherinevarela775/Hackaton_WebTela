@@ -48,4 +48,12 @@ def create_app(config_class=Config):
     def serve_index():
         return send_file(os.path.join(FRONTEND_DIR, "index.html"))
 
+    from app.routes import auth, products, orders, vendor, admin, favorites
+    app.register_blueprint(auth.bp, url_prefix="/api/auth")
+    app.register_blueprint(products.bp, url_prefix="/api/products")
+    app.register_blueprint(orders.bp, url_prefix="/api/orders")
+    app.register_blueprint(vendor.bp, url_prefix="/api/vendor")
+    app.register_blueprint(admin.bp, url_prefix="/api/admin")
+    app.register_blueprint(favorites.bp, url_prefix="/api/favorites")
+
     return app
