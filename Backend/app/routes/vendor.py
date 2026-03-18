@@ -94,3 +94,26 @@ def delete_vendor_product(product_id):
     db.session.delete(product)
     db.session.commit()
     return jsonify({'message': 'Producto eliminado'}), 200
+
+
+@vendor_bp.route('/api/vendor/orders', methods=['GET'])
+@jwt_required()
+@require_role('vendedor')
+def get_vendor_orders():
+    from app.models.order import Order
+    from app.models.product import Product
+    user_id = get_jwt_identity()
+    # Obtener IDs de productos del vendedor
+    product_ids = [p.id for p in Product.query.filter_by(vendor_id=user_id).all()]
+    # Obtener ordenes que contienen esos productos
+    orders = Order.query.all()
+    vendor_orders = []
+    import json
+    for order in orders:
+        try:
+            items = json.loads(order.items or '[]')
+            if any(str(item.get('product_id')) in [str(pid) for pid in product_ids] for item in items):
+                vendor_orders.append(order.to_dict())
+        except Exception:
+            pass
+    return jsonify(vendor_orders), 200
